@@ -1,19 +1,7 @@
 <section class="header">
-  <button (click)="initGraph()">初始化画布</button>
-  <button (click)="type = 'add-node'">添加节点</button>
-  <!-- <button (click)="type = 'init-graph'">初始化画布</button>
-  <button (click)="type = 'add-node'">添加节点</button> -->
+  <button (click)="addNode1()">添加节点(构造函数)</button>
+  <button (click)="addNode2()">添加节点(graph自带)</button>
+  <button (click)="addNode3()">添加节点(HTML)</button>
 </section>
 
-<!-- <ng-container [ngSwitch]="type">
-  <ng-container *ngSwitchCase="'init-graph'">
-    <app-init-graph></app-init-graph>
-  </ng-container>
-  <ng-container *ngSwitchCase="'add-node'">
-    <app-add-node></app-add-node>
-  </ng-container>
-  <ng-container *ngSwitchDefault>
-    上面那么多按钮, 点一个呗?
-  </ng-container>
-</ng-container> -->
 <div id="container" #container></div>

@@ -1,24 +1,87 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
-import { Graph, Edge, Shape } from '@antv/x6';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { Graph, Edge, Shape, Cell } from '@antv/x6';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent {
-  type: 'init-graph' | 'add-node' | '' = '';
-  
+export class AppComponent implements AfterViewInit {
   @ViewChild('container') container: ElementRef;
   graph: Graph;
 
-  initGraph(): void {
+  addNode1(): void {
+    // 创建节点
+    const rect = new Shape.Rect({
+      x: 100,
+      y: 50,
+      width: 80,
+      height: 40,
+      attrs: {
+        body: {
+          fill: 'blue',
+        },
+        label: {
+          text: 'Hello',
+          fill: 'white',
+        },
+      },
+    });
+    // 添加到画布
+    this.graph.addNode(rect);
+  }
+
+  addNode2(): void {
+    const rect = this.graph.addNode({
+      shape: 'rect', // 指定使用何种图形，默认值为 'rect'
+      x: 100,
+      y: 150,
+      width: 80,
+      height: 40,
+      attrs: {
+        body: {
+          fill: 'blue',
+        },
+        label: {
+          text: 'Hello',
+          fill: 'white',
+        },
+      },
+    });
+  }
+
+  addNode3(): void {
+    const data = {
+      shape: 'html',
+      x: 100,
+      y: 250,
+      width: 80,
+      height: 40,
+      html: {
+        // 节点内容, 使用HTML进行渲染
+        render(node: Cell): HTMLDivElement {
+          const wrap = document.createElement('div');
+          wrap.className = 'created-by-html';
+          wrap.innerHTML = 'Hello';
+          return wrap;
+        },
+        // 控制节点重新渲染
+        shouldComponentUpdate(node: Cell): boolean {
+          return node.hasChanged('data');
+        },
+      },
+    };
+    const cell = this.graph.createNode(data);
+    this.graph.addCell(cell);
+  }
+
+  private initGraph(): void {
     const that = this;
     this.graph = new Graph({
       container: that.container.nativeElement,
       panning: true, // 画布拖拽
       selecting: true,
-      width: 600,
+      width: document.body.scrollWidth,
       height: 400,
       background: { color: '#f7f8fa' },
       connecting: {
@@ -34,7 +97,7 @@ export class AppComponent {
         // 连接线的样式
         createEdge(): Edge<Edge.Properties> {
           return new Shape.Edge({
-            router: { name: 'manhattan' }
+            router: { name: 'manhattan' },
           });
         },
         // 是否允许创建连接线(连出的时候)
@@ -55,11 +118,16 @@ export class AppComponent {
           targetMagnet,
           sourceCell,
           targetCell,
-          type
+          type,
         }) {
           return true;
-        }
-      }
+        },
+      },
     });
+  }
+
+  // 必须是在这个钩子中初始化
+  ngAfterViewInit(): void {
+    this.initGraph();
   }
 }
