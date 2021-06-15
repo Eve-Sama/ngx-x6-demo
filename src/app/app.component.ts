@@ -4,7 +4,7 @@ import { Graph, Edge, Shape, Cell } from '@antv/x6';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
+  styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements AfterViewInit {
   @ViewChild('container') container: ElementRef;
@@ -19,13 +19,13 @@ export class AppComponent implements AfterViewInit {
       height: 40,
       attrs: {
         body: {
-          fill: 'blue',
+          fill: 'blue'
         },
         label: {
           text: 'Hello',
-          fill: 'white',
-        },
-      },
+          fill: 'white'
+        }
+      }
     });
     // 添加到画布
     this.graph.addNode(rect);
@@ -40,13 +40,13 @@ export class AppComponent implements AfterViewInit {
       height: 40,
       attrs: {
         body: {
-          fill: 'blue',
+          fill: 'blue'
         },
         label: {
           text: 'Hello',
-          fill: 'white',
-        },
-      },
+          fill: 'white'
+        }
+      }
     });
   }
 
@@ -68,11 +68,50 @@ export class AppComponent implements AfterViewInit {
         // 控制节点重新渲染
         shouldComponentUpdate(node: Cell): boolean {
           return node.hasChanged('data');
-        },
-      },
+        }
+      }
     };
     const cell = this.graph.createNode(data);
     this.graph.addCell(cell);
+  }
+
+  addEdge(): void {
+    this.graph.clearCells();
+    const node1 = new Shape.Rect({
+      x: 100,
+      y: 100,
+      width: 80,
+      height: 40,
+      attrs: {
+        label: {
+          text: 'Hello'
+        }
+      }
+    });
+    const node2 = new Shape.Rect({
+      x: 300,
+      y: 100,
+      width: 80,
+      height: 40,
+      attrs: {
+        label: {
+          text: 'Hello'
+        }
+      }
+    });
+    const edge = new Shape.Edge({
+      source: node1,
+      target: node2,
+    })
+    setTimeout(() => {
+      this.graph.addCell(node1);
+    }, 500);
+    setTimeout(() => {
+      this.graph.addCell(node2);
+    }, 1000);
+    setTimeout(() => {
+      this.graph.addCell(edge);
+    }, 1500);
   }
 
   private initGraph(): void {
@@ -97,7 +136,7 @@ export class AppComponent implements AfterViewInit {
         // 连接线的样式
         createEdge(): Edge<Edge.Properties> {
           return new Shape.Edge({
-            router: { name: 'manhattan' },
+            router: { name: 'manhattan' }
           });
         },
         // 是否允许创建连接线(连出的时候)
@@ -118,11 +157,11 @@ export class AppComponent implements AfterViewInit {
           targetMagnet,
           sourceCell,
           targetCell,
-          type,
+          type
         }) {
           return true;
-        },
-      },
+        }
+      }
     });
   }
 
