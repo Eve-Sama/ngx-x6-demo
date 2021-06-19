@@ -1,8 +1,34 @@
 <section class="header">
-  <button (click)="addNode1()">添加节点(构造函数)</button>
-  <button (click)="addNode2()">添加节点(graph自带)</button>
-  <button (click)="addNode3()">添加节点(HTML)</button>
-  <button (click)="addEdge()">添加边(节点对节点)</button>
+  <table>
+    <tr>
+      <th>类别</th>
+      <th>操作</th>
+    </tr>
+    <tr>
+      <td>画布</td>
+      <td>
+        <button (click)="clear()">清除</button>
+        <button (click)="print()">打印画布数据</button>
+      </td>
+    </tr>
+    <tr>
+      <td>节点</td>
+      <td>
+        <button (click)="addNode1()">添加节点(构造函数)</button>
+        <button (click)="addNode2()">添加节点(graph自带)</button>
+        <button (click)="addNode3()">添加节点(HTML)</button>
+      </td>
+    </tr>
+    <tr>
+      <td>边(连接线)</td>
+      <td>
+        <button (click)="addEdgeWithNode()">添加边(节点对节点)</button>
+        <button (click)="addPort()">添加桩点(无连接线)</button>
+        <button (click)="addPortWithEdge()">添加桩点(有连接线)</button>
+        <button (click)="addPortWithManhattan()">躲避障碍物的连接线</button>
+      </td>
+    </tr>
+  </table>
 </section>
 
 <div id="container" #container></div>
