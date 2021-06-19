@@ -9,6 +9,23 @@ import { Graph, Edge, Shape, Cell } from '@antv/x6';
 export class AppComponent implements AfterViewInit {
   @ViewChild('container') container: ElementRef;
   graph: Graph;
+  /** x6画布的一些基础属性 */
+  graphBasicConfig = {
+    panning: true, // 画布拖拽
+    selecting: true,
+    width: document.body.scrollWidth,
+    height: 400,
+    background: { color: '#f7f8fa' },
+    connecting: {
+      snap: true, // 连线的过程中距离节点或者连接桩 50px 时会触发自动吸附
+      allowBlank: false, // 是否允许连接到画布空白位置的点
+      allowLoop: false, // 是否允许创建循环连线，即边的起始节点和终止节点为同一节点
+      allowNode: false, // 是否允许边链接到节点（非节点上的链接桩）
+      allowEdge: false, // 是否允许边链接到另一个边
+      connector: 'rounded',
+      connectionPoint: 'boundary'
+    }
+  };
 
   // 添加节点(构造函数)
   addNode1(): void {
@@ -161,7 +178,6 @@ export class AppComponent implements AfterViewInit {
         items: [{ group: 'out' }]
       }
     });
-    console.log(node1, `node1`);
     const node2 = new Shape.Rect({
       x: 300,
       y: 100,
@@ -226,7 +242,6 @@ export class AppComponent implements AfterViewInit {
         items: [{ group: 'out' }]
       }
     });
-    console.log(node1, `node1`);
     const node2 = new Shape.Rect({
       x: 300,
       y: 100,
@@ -302,7 +317,6 @@ export class AppComponent implements AfterViewInit {
         items: [{ group: 'out' }]
       }
     });
-    console.log(node1, `node1`);
     const node2 = new Shape.Rect({
       x: 300,
       y: 100,
@@ -339,40 +353,35 @@ export class AppComponent implements AfterViewInit {
     console.log(data, `画布的结果转化为JSON`);
   }
 
-  /** x6画布的一些基础属性 */
-  graphBasicConfig = {
-    panning: true, // 画布拖拽
-    selecting: true,
-    width: document.body.scrollWidth,
-    height: 400,
-    background: { color: '#f7f8fa' },
-    connecting: {
-      snap: true, // 连线的过程中距离节点或者连接桩 50px 时会触发自动吸附
-      allowBlank: false, // 是否允许连接到画布空白位置的点
-      allowLoop: false, // 是否允许创建循环连线，即边的起始节点和终止节点为同一节点
-      allowNode: false, // 是否允许边链接到节点（非节点上的链接桩）
-      allowEdge: false, // 是否允许边链接到另一个边
-      connector: 'rounded',
-      connectionPoint: 'boundary'
-    }
-  };
-
-  private initGraph(): void {
+  manhattan(): void {
+    const that = this;
     const graphConfig = {
       ...this.graphBasicConfig,
       container: this.container.nativeElement,
       // 连接线的样式
       createEdge(): Edge<Edge.Properties> {
         return new Shape.Edge({
-          router: { name: 'normal' }
+          router: { name: 'manhattan' }
         });
       }
+    };
+    this.graph = new Graph(graphConfig);
+    setTimeout(() => {
+      this.addPort();
+    }, 3000);
+  }
+
+  private initGraph(): void {
+    const graphConfig = {
+      ...this.graphBasicConfig,
+      container: this.container.nativeElement
     };
     this.graph = new Graph(graphConfig);
   }
 
   // 必须是在这个钩子中初始化
   ngAfterViewInit(): void {
+    // this.manhattan();
     this.initGraph();
   }
 }
