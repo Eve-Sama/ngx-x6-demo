@@ -24,9 +24,21 @@
       <td>边(连接线)</td>
       <td>
         <button (click)="addEdgeWithNode()">添加边(节点对节点)</button>
-        <button (click)="addPort()">添加桩点(无连接线)</button>
+        <button (click)="addPortWithoutEdge()">添加桩点(无连接线)</button>
         <button (click)="addPortWithEdge()">添加桩点(有连接线)</button>
         <button (click)="addPortWithManhattan()">躲避障碍物的连接线</button>
+      </td>
+    </tr>
+    <tr>
+      <td>拖拽</td>
+      <td>
+        <div *ngIf="dndFinishWithJudge" class="images">
+          <img [src]="Heros.get('Timor')" data-label="Timor" (mousedown)="startDrag($event)">
+          <img [src]="Heros.get('Morgana')" data-label="Morgana" (mousedown)="startDrag($event)">
+          <img [src]="Heros.get('Yasuo')" data-label="Yasuo" (mousedown)="startDrag($event)">
+          <img [src]="Heros.get('Jinx')" data-label="Jinx" (mousedown)="startDrag($event)">
+        </div>
+        <button *ngIf="!dndFinishWithJudge" (click)="initDndWithJudge()">初始化拖拽</button>
       </td>
     </tr>
   </table>

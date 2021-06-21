@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { Graph, Edge, Shape, Cell } from '@antv/x6';
+import { Graph, Edge, Shape, Cell, Addon } from '@antv/x6';
+import { Heros, HeroType } from './app.config';
 
 @Component({
   selector: 'app-root',
@@ -7,8 +8,12 @@ import { Graph, Edge, Shape, Cell } from '@antv/x6';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements AfterViewInit {
+  Heros = Heros;
+
   @ViewChild('container') container: ElementRef;
   graph: Graph;
+  dnd: Addon.Dnd;
+  dndFinishWithJudge: boolean;
   /** x6画布的一些基础属性 */
   graphBasicConfig = {
     panning: true, // 画布拖拽
@@ -134,7 +139,7 @@ export class AppComponent implements AfterViewInit {
   }
 
   // 添加桩点(无连接线)
-  addPort(): void {
+  addPortWithoutEdge(): void {
     this.graph.clearCells();
     // 连接节点分组, 定义好入口和出口样式
     const groups = {
@@ -353,22 +358,143 @@ export class AppComponent implements AfterViewInit {
     console.log(data, `画布的结果转化为JSON`);
   }
 
-  manhattan(): void {
+  initDndWithJudge(): void {
     const that = this;
-    const graphConfig = {
+    // #region 重新渲染画布参数
+    const graphConfig: { [key: string]: any } = {
       ...this.graphBasicConfig,
-      container: this.container.nativeElement,
-      // 连接线的样式
-      createEdge(): Edge<Edge.Properties> {
-        return new Shape.Edge({
-          router: { name: 'manhattan' }
-        });
+      container: this.container.nativeElement
+    };
+    // 是否允许创建连接线(连出的时候)
+    graphConfig.connecting.validateMagnet = (config: { cell: any }) => {
+      const label = config.cell.data.label as HeroType;
+      if (label === 'Morgana') {
+        alert('莫甘娜: 我不会主动攻击人啊, 嘤嘤嘤~');
+        return false;
       }
+      return true;
+    };
+    // 是否允许创建连接线(连入的时候)
+    graphConfig.connecting.validateConnection = (config: {
+      edge: any;
+      edgeView: any;
+      sourceView: any;
+      targetView: any;
+      sourcePort: any;
+      targetPort: any;
+      sourceMagnet: any;
+      targetMagnet: any;
+      sourceCell: any;
+      targetCell: any;
+      type: any;
+    }) => {
+      console.log(config, `config`);
+      const { sourceCell, targetCell } = config;
+      const label = sourceCell.data.label as HeroType;
+      if (label !== 'Morgana') {
+        const incomingEdges = that.graph.getOutgoingEdges(sourceCell) || [];
+        if (incomingEdges.length > 1) {
+          alert('提莫: 打一下就跑! 再打要挨揍了!');
+          return false;
+        }
+      }
+      return true;
     };
     this.graph = new Graph(graphConfig);
-    setTimeout(() => {
-      this.addPort();
-    }, 3000);
+    // #endregion
+    // #region 初始化拖拽的参数
+    const { Dnd } = Addon;
+    this.dnd = new Dnd({
+      target: this.graph,
+      validateNode(node, options): boolean {
+        const label = node.data.label as HeroType;
+        if (label === 'Yasuo') {
+          alert('禁止使用孤儿英雄!');
+          return false;
+        }
+        return true;
+      }
+    });
+    // #endregion
+    this.dndFinishWithJudge = true;
+  }
+
+  /** 使用曼哈顿路由, 也就是让节点的连接线避开节点 */
+  manhattan(): void {
+    const graphConfig: { [key: string]: any } = {
+      ...this.graphBasicConfig,
+      container: this.container.nativeElement
+    };
+    graphConfig.connecting.createEdge = () => {
+      return new Shape.Edge({
+        router: { name: 'manhattan' }
+      });
+    };
+    this.graph = new Graph(graphConfig);
+    this.addPortWithoutEdge();
+  }
+
+  startDrag(e: MouseEvent): void {
+    const target = e.currentTarget as HTMLElement;
+    const label = target.getAttribute('data-label') as HeroType;
+    const base64 = this.Heros.get(label);
+    const portItems: Array<{
+      group: 'in' | 'out'; // 桩的入口或出口
+    }> = [];
+    if (label === 'Timor') {
+      portItems.push({ group: 'out' });
+    } else if (label === 'Morgana') {
+      portItems.push({ group: 'in' }, { group: 'out' });
+    } else if (label === 'Jinx') {
+      portItems.push({ group: 'in' });
+    }
+    const data = {
+      size: { width: 65, height: 65 },
+      shape: 'html',
+      data: { label },
+      html: {
+        render(node: Cell): HTMLDivElement {
+          const wrap = document.createElement('div');
+          wrap.className = 'LOL-hero';
+          wrap.innerHTML = `
+            <img src="${base64}" />
+          `;
+          return wrap;
+        }
+      },
+      ports: {
+        // 连接节点分组, 定义好入口和出口样式
+        groups: {
+          in: {
+            position: 'left',
+            attrs: {
+              circle: {
+                r: 5,
+                magnet: true,
+                stroke: '#CCD4E0',
+                strokeWidth: 1,
+                fill: '#fff'
+              }
+            }
+          },
+          out: {
+            position: 'right',
+            attrs: {
+              circle: {
+                r: 5,
+                magnet: true, // 是否允许吸附
+                stroke: '#CCD4E0',
+                strokeWidth: 1,
+                fill: '#fff'
+              }
+            }
+          }
+        },
+        items: portItems
+      }
+    };
+    const node = this.graph.createNode(data);
+    this.dnd.start(node, e);
   }
 
   private initGraph(): void {
@@ -381,7 +507,6 @@ export class AppComponent implements AfterViewInit {
 
   // 必须是在这个钩子中初始化
   ngAfterViewInit(): void {
-    // this.manhattan();
     this.initGraph();
   }
 }
