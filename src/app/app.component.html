@@ -41,7 +41,17 @@
         <button *ngIf="!dndFinishWithJudge" (click)="initDndWithJudge()">初始化拖拽</button>
       </td>
     </tr>
+    <tr>
+      <td>将Angular组件作为节点</td>
+      <td>
+        <button (click)="addAngularComponent()">添加Angular组件</button>
+      </td>
+    </tr>
   </table>
 </section>
 
 <div id="container" #container></div>
+
+<ng-template #demoTpl>
+  <div>hello</div>
+</ng-template>

@@ -1,6 +1,7 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { Graph, Edge, Shape, Cell, Addon } from '@antv/x6';
+import { AfterViewInit, Component, ElementRef, TemplateRef, ViewChild } from '@angular/core';
+import { Graph, Shape, Cell, Addon } from '@antv/x6';
 import { Heros, HeroType } from './app.config';
+import './x6-angular-shape/index'
 
 @Component({
   selector: 'app-root',
@@ -11,6 +12,7 @@ export class AppComponent implements AfterViewInit {
   Heros = Heros;
 
   @ViewChild('container') container: ElementRef;
+  @ViewChild('demoTpl', { static: true }) demoTpl: TemplateRef<void>;
   graph: Graph;
   dnd: Addon.Dnd;
   dndFinishWithJudge: boolean;
@@ -497,6 +499,22 @@ export class AppComponent implements AfterViewInit {
     this.dnd.start(node, e);
   }
 
+  addAngularComponent(): void {
+    // this.graph.addNode({
+    //   shape: 'AngularShape',
+    //   x: 30,
+    //   y: 40,
+    // })
+    const source = this.graph.addNode({
+      x: 40,
+      y: 40,
+      width: 100,
+      height: 40,
+      shape: 'react-shape',
+      component: this.demoTpl,
+    })
+  }
+  
   private initGraph(): void {
     const graphConfig = {
       ...this.graphBasicConfig,
