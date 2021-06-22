@@ -1,3 +1,4 @@
+import { ComponentFactoryResolver } from '@angular/core'
 import { Node, Markup, ObjectExt } from '@antv/x6'
 import { Definition } from './registry'
 
@@ -14,6 +15,10 @@ export class AngularShape<
 
   getComponent(): AngularShape.Properties['component'] {
     return this.store.get('component')
+  }
+
+  getCfr(): ComponentFactoryResolver {
+    return this.store.get('cfr')
   }
 
   setComponent(
@@ -75,7 +80,7 @@ export namespace AngularShape {
 
     return markup
   }
-  AngularShape.config({
+  const data ={
     view: 'angular-shape-view',
     markup: getMarkup(true),
     attrs: {
@@ -138,7 +143,8 @@ export namespace AngularShape {
       }
       return metadata
     },
-  })
+  }
+  AngularShape.config(data as any);
 
   Node.registry.register('angular-shape', AngularShape, true)
 }

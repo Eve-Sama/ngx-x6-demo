@@ -1,7 +1,8 @@
-import { AfterViewInit, Component, ElementRef, TemplateRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ComponentFactoryResolver, ElementRef, TemplateRef, ViewChild } from '@angular/core';
 import { Graph, Shape, Cell, Addon } from '@antv/x6';
 import { Heros, HeroType } from './app.config';
-import './x6-angular-shape/index'
+import { NodeComponent } from './node-component/node.component';
+import './x6-angular-shape/index';
 
 @Component({
   selector: 'app-root',
@@ -500,21 +501,17 @@ export class AppComponent implements AfterViewInit {
   }
 
   addAngularComponent(): void {
-    // this.graph.addNode({
-    //   shape: 'AngularShape',
-    //   x: 30,
-    //   y: 40,
-    // })
     const source = this.graph.addNode({
       x: 40,
       y: 40,
       width: 100,
       height: 40,
-      shape: 'react-shape',
-      component: this.demoTpl,
-    })
+      shape: 'angular-shape',
+      cfr: this.componentFactoryResolver,
+      component: NodeComponent
+    });
   }
-  
+
   private initGraph(): void {
     const graphConfig = {
       ...this.graphBasicConfig,
@@ -522,6 +519,8 @@ export class AppComponent implements AfterViewInit {
     };
     this.graph = new Graph(graphConfig);
   }
+
+  constructor(private componentFactoryResolver: ComponentFactoryResolver) {}
 
   // 必须是在这个钩子中初始化
   ngAfterViewInit(): void {
