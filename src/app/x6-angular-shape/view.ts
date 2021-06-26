@@ -1,4 +1,4 @@
-import { ApplicationRef, Component, ComponentFactoryResolver, TemplateRef, ViewContainerRef } from '@angular/core';
+import { ApplicationRef, ComponentFactoryResolver, TemplateRef, ViewContainerRef } from '@angular/core';
 import { NodeView, Scheduler } from '@antv/x6';
 import { AngularShape } from './node';
 import { ComponentPortal, DomPortalOutlet, TemplatePortal } from '@angular/cdk/portal';
@@ -15,18 +15,15 @@ export class AngularShapeView extends NodeView<AngularShape> {
   confirmUpdate(flag: number) {
     const ret = super.confirmUpdate(flag);
     return this.handleAction(ret, AngularShapeView.action, () => {
-      Scheduler.scheduleTask(() => {
-        this.renderAngularContent();
-      });
+      Scheduler.scheduleTask(() => this.renderAngularContent());
     });
   }
 
   protected renderAngularContent() {
     this.unmountAngularContent();
     const root = this.getContentContainer();
-    const node = this.cell;
-
     if (root) {
+      const node = this.cell;
       const content = this.graph.hook.getAngularContent(node);
       const injector = this.graph.hook.getAngularInjector(node);
       const applicationRef = injector.get(ApplicationRef);

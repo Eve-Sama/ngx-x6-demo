@@ -1,41 +1,16 @@
 import { Injector } from '@angular/core'
 import { Node, Markup, ObjectExt } from '@antv/x6'
-import { Definition } from './registry'
+import { Content } from './registry'
 
 export class AngularShape<
   Properties extends AngularShape.Properties = AngularShape.Properties,
 > extends Node<Properties> {
-  get content() {
-    return this.getContent()
-  }
-
-  set content(val: AngularShape.Properties['content']) {
-    this.setContent(val)
-  }
-
-  getContent(): AngularShape.Properties['content'] {
+  getContent(): Content {
     return this.store.get('content')
   }
 
   getInjector(): Injector {
     return this.store.get('injector')
-  }
-
-  setContent(
-    content: AngularShape.Properties['content'],
-    options: Node.SetOptions = {},
-  ) {
-    if (content == null) {
-      this.removeContent(options)
-    } else {
-      this.store.set('content', content, options)
-    }
-    return this
-  }
-
-  removeContent(options: Node.SetOptions = {}) {
-    this.store.remove('content', options)
-    return this
   }
 }
 
@@ -51,7 +26,7 @@ export namespace AngularShape {
   export interface Properties extends Node.Properties {
     primer?: Primer
     useForeignObject?: boolean
-    content?: Definition
+    content: Content
   }
 }
 

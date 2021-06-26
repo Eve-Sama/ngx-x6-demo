@@ -1,9 +1,9 @@
 import { Component, TemplateRef } from '@angular/core'
-import { Graph, Node, Registry } from '@antv/x6'
+import { Graph, Registry } from '@antv/x6'
 
-export type Definition = ((this: Graph, node: Node) => TemplateRef<{}> | Component)
+export type Content = TemplateRef<{}> | Component;
 
-export const registry = Registry.create<Definition>({
+export const registry = Registry.create<Content>({
   type: 'angular componnet',
 })
 
