@@ -1,6 +1,17 @@
-import { AfterViewInit, Component, ComponentFactoryResolver, ElementRef, TemplateRef, ViewChild } from '@angular/core';
+import { ComponentPortal, DomPortalOutlet } from '@angular/cdk/portal';
+import {
+  AfterViewInit,
+  ApplicationRef,
+  Component,
+  ComponentFactoryResolver,
+  ElementRef,
+  Injector,
+  TemplateRef,
+  ViewChild
+} from '@angular/core';
 import { Graph, Shape, Cell, Addon } from '@antv/x6';
 import { Heros, HeroType } from './app.config';
+import { AppService } from './app.service';
 import { NodeComponent } from './node-component/node.component';
 import './x6-angular-shape/index';
 
@@ -500,18 +511,45 @@ export class AppComponent implements AfterViewInit {
     this.dnd.start(node, e);
   }
 
+  send(): void {
+    this.appService.subject$.next();
+  }
+
   addAngularComponent(): void {
-    const source = this.graph.addNode({
+    
+    // const {componentFactoryResolver, applicationRef, injector} = injector2;
+    // const root = document.querySelector('.container2222') as Element;
+    // const domOutlet = new DomPortalOutlet(root, this.componentFactoryResolver, this.applicationRef, this.injector);
+    // const portal = new ComponentPortal(NodeComponent);
+    // domOutlet.attachComponentPortal(portal);
+    // injector: {
+    //   applicationRef: this.applicationRef,
+    //   componentFactoryResolver: this.componentFactoryResolver,
+    //   injector: this.injector
+    // },
+    this.graph.addNode({
       x: 40,
       y: 40,
       width: 100,
       height: 40,
       shape: 'angular-shape',
-      cfr: this.componentFactoryResolver,
+      injector: this.injector,
       component: NodeComponent
     });
   }
 
+  addAngularTemplate(): void {
+    this.graph.addNode({
+      x: 240,
+      y: 40,
+      width: 100,
+      height: 40,
+      shape: 'angular-shape',
+      injector: this.injector,
+      component: this.demoTpl
+    });
+  }
+  
   private initGraph(): void {
     const graphConfig = {
       ...this.graphBasicConfig,
@@ -520,7 +558,12 @@ export class AppComponent implements AfterViewInit {
     this.graph = new Graph(graphConfig);
   }
 
-  constructor(private componentFactoryResolver: ComponentFactoryResolver) {}
+  constructor(
+    private componentFactoryResolver: ComponentFactoryResolver,
+    private applicationRef: ApplicationRef,
+    private appService: AppService,
+    private injector: Injector
+  ) {}
 
   // 必须是在这个钩子中初始化
   ngAfterViewInit(): void {

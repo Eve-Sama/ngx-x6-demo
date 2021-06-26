@@ -1,40 +1,40 @@
-import { ComponentFactoryResolver } from '@angular/core'
+import { ComponentFactoryResolver, Injector } from '@angular/core'
 import { Node, Markup, ObjectExt } from '@antv/x6'
 import { Definition } from './registry'
 
 export class AngularShape<
   Properties extends AngularShape.Properties = AngularShape.Properties,
 > extends Node<Properties> {
-  get component() {
-    return this.getComponent()
+  get content() {
+    return this.getContent()
   }
 
-  set component(val: AngularShape.Properties['component']) {
-    this.setComponent(val)
+  set content(val: AngularShape.Properties['content']) {
+    this.setContent(val)
   }
 
-  getComponent(): AngularShape.Properties['component'] {
-    return this.store.get('component')
+  getContent(): AngularShape.Properties['content'] {
+    return this.store.get('content')
   }
 
-  getCfr(): ComponentFactoryResolver {
-    return this.store.get('cfr')
+  getInjector(): Injector {
+    return this.store.get('injector')
   }
 
-  setComponent(
-    component: AngularShape.Properties['component'],
+  setContent(
+    content: AngularShape.Properties['content'],
     options: Node.SetOptions = {},
   ) {
-    if (component == null) {
-      this.removeComponent(options)
+    if (content == null) {
+      this.removeContent(options)
     } else {
-      this.store.set('component', component, options)
+      this.store.set('content', content, options)
     }
     return this
   }
 
-  removeComponent(options: Node.SetOptions = {}) {
-    this.store.remove('component', options)
+  removeContent(options: Node.SetOptions = {}) {
+    this.store.remove('content', options)
     return this
   }
 }
@@ -51,7 +51,7 @@ export namespace AngularShape {
   export interface Properties extends Node.Properties {
     primer?: Primer
     useForeignObject?: boolean
-    component?: Definition | string
+    content?: Definition
   }
 }
 

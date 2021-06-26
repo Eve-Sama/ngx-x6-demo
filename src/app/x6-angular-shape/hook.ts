@@ -1,47 +1,40 @@
 import { Graph, FunctionExt } from '@antv/x6'
-import { registry, Definition } from './registry'
+import { Definition } from './registry'
 import { AngularShape } from './node'
-import { ComponentFactoryResolver } from '@angular/core'
+import { Injector } from '@angular/core'
 
 declare module '@antv/x6/lib/graph/hook' {
   namespace Hook {
     interface IHook {
-      getAngularComponent(this: Graph, node: AngularShape): Definition
-      getAngularCfr(this: Graph, node: AngularShape): ComponentFactoryResolver
+      getAngularContent(this: Graph, node: AngularShape): Definition
+      getAngularInjector(this: Graph, node: AngularShape): Injector
     }
   }
 
   interface Hook {
-    getAngularComponent(node: AngularShape): Definition
-    getAngularCfr(node: AngularShape): ComponentFactoryResolver
+    getAngularContent(node: AngularShape): Definition
+    getAngularInjector(node: AngularShape): Injector
   }
 }
 
-Graph.Hook.prototype.getAngularComponent = function (node: AngularShape) {
-  const getAngularComponent = this.options.getAngularComponent
-  if (typeof getAngularComponent === 'function') {
-    const ret = FunctionExt.call(getAngularComponent, this.graph, node)
+Graph.Hook.prototype.getAngularContent = function (node: AngularShape) {
+  const getAngularContent = this.options.getAngularContent
+  if (typeof getAngularContent === 'function') {
+    const ret = FunctionExt.call(getAngularContent, this.graph, node)
     if (ret != null) {
       return ret
     }
   }
 
-  let ret = node.getComponent()
-  if (typeof ret === 'string') {
-    const component = registry.get(ret)
-    if (component == null) {
-      return registry.onNotFound(ret)
-    }
-    ret = component
-  }
+  let ret = node.getContent();
 
   return ret as Definition
 }
 
-Graph.Hook.prototype.getAngularCfr = function (node: AngularShape) {
-  const res = node.getCfr();
+Graph.Hook.prototype.getAngularInjector = function (node: AngularShape) {
+  const res = node.getInjector();
   if (!res) {
-    throw new Error(`x6-angular-shape: You have to pass param 'cfr' and it should be the instance of ComponentFactoryResolver!`);
+    throw new Error(`x6-angular-shape: You have to pass param 'injector' and it should be the instance of Injector!`);
   }
-  return res as ComponentFactoryResolver;
+  return res as Injector;
 }
