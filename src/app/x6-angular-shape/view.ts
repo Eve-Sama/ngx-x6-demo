@@ -36,9 +36,13 @@ export class AngularShapeView extends NodeView<AngularShape> {
       if (content instanceof TemplateRef) {
         const portal = new TemplatePortal(content, viewContainerRef);
         domOutlet.attachTemplatePortal(portal);
-      } else if (content instanceof Component) {
-        const portal = new ComponentPortal(content as any, viewContainerRef);
-        domOutlet.attachComponentPortal(portal);
+      } else {
+        try {
+          const portal = new ComponentPortal(content as any, viewContainerRef);
+          domOutlet.attachComponentPortal(portal);
+        } catch (error) {
+          throw Error(`x6-angular-shape: The param 'content' should be the instanceof TemplateRef or ComponentType! Angular: ${error}`);
+        }
       }
     }
   }

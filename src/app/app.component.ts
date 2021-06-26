@@ -516,22 +516,11 @@ export class AppComponent implements AfterViewInit {
   }
 
   addAngularComponent(): void {
-    
-    // const {componentFactoryResolver, applicationRef, injector} = injector2;
-    // const root = document.querySelector('.container2222') as Element;
-    // const domOutlet = new DomPortalOutlet(root, this.componentFactoryResolver, this.applicationRef, this.injector);
-    // const portal = new ComponentPortal(NodeComponent);
-    // domOutlet.attachComponentPortal(portal);
-    // injector: {
-    //   applicationRef: this.applicationRef,
-    //   componentFactoryResolver: this.componentFactoryResolver,
-    //   injector: this.injector
-    // },
     this.graph.addNode({
       x: 40,
       y: 40,
-      width: 100,
-      height: 40,
+      width: 160,
+      height: 20,
       shape: 'angular-shape',
       injector: this.injector,
       content: NodeComponent
@@ -542,8 +531,8 @@ export class AppComponent implements AfterViewInit {
     this.graph.addNode({
       x: 240,
       y: 40,
-      width: 100,
-      height: 40,
+      width: 160,
+      height: 20,
       shape: 'angular-shape',
       injector: this.injector,
       content: this.demoTpl
@@ -559,8 +548,6 @@ export class AppComponent implements AfterViewInit {
   }
 
   constructor(
-    private componentFactoryResolver: ComponentFactoryResolver,
-    private applicationRef: ApplicationRef,
     private appService: AppService,
     private injector: Injector
   ) {}
