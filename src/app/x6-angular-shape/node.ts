@@ -1,4 +1,4 @@
-import { ComponentFactoryResolver, Injector } from '@angular/core'
+import { Injector } from '@angular/core'
 import { Node, Markup, ObjectExt } from '@antv/x6'
 import { Definition } from './registry'
 

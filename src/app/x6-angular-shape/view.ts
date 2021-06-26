@@ -7,8 +7,8 @@ export class AngularShapeView extends NodeView<AngularShape> {
   protected init() {
     super.init();
   }
-  componentFactoryResolve: ComponentFactoryResolver;
-  getComponentContainer() {
+
+  getContentContainer() {
     return this.selectors.foContent as HTMLDivElement;
   }
 
@@ -16,17 +16,16 @@ export class AngularShapeView extends NodeView<AngularShape> {
     const ret = super.confirmUpdate(flag);
     return this.handleAction(ret, AngularShapeView.action, () => {
       Scheduler.scheduleTask(() => {
-        this.renderAngularComponent();
+        this.renderAngularContent();
       });
     });
   }
 
-  protected renderAngularComponent() {
-    this.unmountAngularComponent();
-    const root = this.getComponentContainer();
+  protected renderAngularContent() {
+    this.unmountAngularContent();
+    const root = this.getContentContainer();
     const node = this.cell;
 
-    // root is a host element, also be a ordinary dom
     if (root) {
       const content = this.graph.hook.getAngularContent(node);
       const injector = this.graph.hook.getAngularInjector(node);
@@ -38,44 +37,26 @@ export class AngularShapeView extends NodeView<AngularShape> {
         const portal = new TemplatePortal(content, viewContainerRef);
         domOutlet.attachTemplatePortal(portal);
       } else if (content instanceof Component) {
-        // const content2 = content as unknown as ComponentType<T>;
         const portal = new ComponentPortal(content as any, viewContainerRef);
         domOutlet.attachComponentPortal(portal);
       }
-      // const portal = new ComponentPortal(component);
-      // const {componentFactoryResolver, applicationRef, injector} = injector2;
-      // const domOutlet = new DomPortalOutlet(root, componentFactoryResolver, applicationRef, injector);
-      // domOutlet.attachComponentPortal(component);
-
-      // const component = this.graph.hook.getAngularComponent(node) as any;
-      // console.log(component, `component`);
-      // const cfr = this.graph.hook.getAngularCfr(node);
-      // console.log(cfr, `cfr`);
-      // const injector = this.graph.hook.getAngularInjector(node) as any;
-      // console.log(injector, `injector`);
-      // const componentFactoryResolver = injector.get(ComponentFactoryResolver);
-      // const applicationRef = injector.get(ApplicationRef);
-      // const viewContainerRef = injector.get(ViewContainerRef);
-      // const portal = new TemplatePortal(component as any, viewContainerRef);
-      // const domOutlet = new DomPortalOutlet(root, componentFactoryResolver, applicationRef, injector);
-      // domOutlet.attachTemplatePortal(portal);
     }
   }
 
-  protected unmountAngularComponent() {
-    const root = this.getComponentContainer();
+  protected unmountAngularContent() {
+    const root = this.getContentContainer();
     root.innerHTML = '';
     return root;
   }
 
   unmount() {
-    this.unmountAngularComponent();
+    this.unmountAngularContent();
     return this;
   }
 
   @NodeView.dispose()
   dispose() {
-    this.unmountAngularComponent();
+    this.unmountAngularContent();
   }
 }
 

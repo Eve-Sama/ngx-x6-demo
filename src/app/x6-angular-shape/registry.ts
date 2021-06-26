@@ -10,10 +10,10 @@ export const registry = Registry.create<Definition>({
 declare module '@antv/x6/lib/graph/graph' {
   // eslint-disable-next-line @typescript-eslint/no-shadow
   namespace Graph {
-    let registerAngularComponent: typeof registry.register
-    let unregisterAngularComponent: typeof registry.unregister
+    let registerAngularContent: typeof registry.register
+    let unregisterAngularContent: typeof registry.unregister
   }
 }
 
-Graph.registerAngularComponent = registry.register
-Graph.unregisterAngularComponent = registry.unregister
+Graph.registerAngularContent = registry.register
+Graph.unregisterAngularContent = registry.unregister

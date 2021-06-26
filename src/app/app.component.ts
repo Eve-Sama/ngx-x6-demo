@@ -534,7 +534,7 @@ export class AppComponent implements AfterViewInit {
       height: 40,
       shape: 'angular-shape',
       injector: this.injector,
-      component: NodeComponent
+      content: NodeComponent
     });
   }
 
@@ -546,7 +546,7 @@ export class AppComponent implements AfterViewInit {
       height: 40,
       shape: 'angular-shape',
       injector: this.injector,
-      component: this.demoTpl
+      content: this.demoTpl
     });
   }
   
