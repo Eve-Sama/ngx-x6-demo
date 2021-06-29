@@ -1,21 +1,10 @@
-import { ComponentPortal, DomPortalOutlet } from '@angular/cdk/portal';
-import {
-  AfterViewInit,
-  ApplicationRef,
-  Component,
-  ComponentFactoryResolver,
-  ElementRef,
-  Injector,
-  TemplateRef,
-  ViewChild
-} from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Injector, TemplateRef, ViewChild } from '@angular/core';
 import { Graph, Shape, Cell, Addon } from '@antv/x6';
 import { HTML } from '@antv/x6/lib/shape/standard';
 import { Heros, HeroType } from './app.config';
 import { AppService } from './app.service';
 import { NodeComponent } from './node-component/node.component';
 import './x6-angular-shape/index';
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -25,7 +14,7 @@ export class AppComponent implements AfterViewInit {
   Heros = Heros;
 
   @ViewChild('container') container: ElementRef;
-  @ViewChild('demoTpl', { static: true }) demoTpl: TemplateRef<void>;
+  @ViewChild('demoTpl', { static: true }) demoTpl: TemplateRef<{}>;
   graph: Graph;
   dnd: Addon.Dnd;
   dndFinishWithJudge: boolean;
@@ -560,26 +549,40 @@ export class AppComponent implements AfterViewInit {
   }
 
   addAngularComponent(): void {
+    Graph.registerAngularContent('demo-component', { injector: this.injector, content: NodeComponent });
     this.graph.addNode({
       x: 40,
       y: 40,
       width: 160,
       height: 30,
       shape: 'angular-shape',
-      injector: this.injector,
-      content: NodeComponent
+      componentName: 'demo-component'
     });
   }
 
   addAngularTemplate(): void {
+    Graph.registerAngularContent('demo-template', { injector: this.injector, content: this.demoTpl });
     this.graph.addNode({
       x: 240,
       y: 40,
       width: 160,
       height: 30,
       shape: 'angular-shape',
-      injector: this.injector,
-      content: this.demoTpl
+      componentName: 'demo-template'
+    });
+  }
+
+  addAngularWithCallback(): void {
+    Graph.registerAngularContent('demo-template-callback', (_node) => {
+      return { injector: this.injector, content: this.demoTpl };
+    });
+    this.graph.addNode({
+      x: 240,
+      y: 40,
+      width: 160,
+      height: 30,
+      shape: 'angular-shape',
+      componentName: 'demo-template-callback'
     });
   }
 
