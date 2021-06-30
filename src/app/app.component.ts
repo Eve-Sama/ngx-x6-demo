@@ -1,7 +1,10 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { Graph, Edge, Shape, Cell, Addon } from '@antv/x6';
+import { AfterViewInit, Component, ElementRef, Injector, TemplateRef, ViewChild } from '@angular/core';
+import { Graph, Shape, Cell, Addon } from '@antv/x6';
+import { HTML } from '@antv/x6/lib/shape/standard';
 import { Heros, HeroType } from './app.config';
-
+import { AppService } from './app.service';
+import { NodeComponent } from './node-component/node.component';
+import './x6-angular-shape/index';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -11,6 +14,7 @@ export class AppComponent implements AfterViewInit {
   Heros = Heros;
 
   @ViewChild('container') container: ElementRef;
+  @ViewChild('demoTpl', { static: true }) demoTpl: TemplateRef<{}>;
   graph: Graph;
   dnd: Addon.Dnd;
   dndFinishWithJudge: boolean;
@@ -98,6 +102,49 @@ export class AppComponent implements AfterViewInit {
     };
     const cell = this.graph.createNode(data);
     this.graph.addCell(cell);
+  }
+
+  removeNode(): void {
+    this.graph.clearCells();
+    this.addNode1();
+    this.graph.on('node:mouseenter', (args: { node: HTML }) => {
+      args.node.addTools({
+        name: 'button-remove', // x6 自带的tool类型
+        // 覆盖删除按钮自带的配置
+        args: {
+          markup: [
+            {
+              tagName: 'circle',
+              selector: 'button',
+              attrs: {
+                r: 8,
+                fill: '#ACB3BD',
+                cursor: 'pointer'
+              }
+            },
+            {
+              tagName: 'path',
+              selector: 'icon',
+              attrs: {
+                d: 'M -3 -3 3 3 M -3 3 3 -3',
+                fill: '#fff',
+                'stroke-width': 2,
+                'pointer-events': 'none'
+              }
+            }
+          ],
+          x: '100%',
+          onClick(config: { view: any; btn: any }): void {
+            const { view, btn } = config;
+            btn.parent.remove();
+            view.cell.remove({ ui: true, toolId: btn.cid });
+          }
+        }
+      });
+    });
+    this.graph.on('node:mouseleave', (args: { node: HTML }) => {
+      args.node.removeTools();
+    });
   }
 
   clear(): void {
@@ -497,6 +544,48 @@ export class AppComponent implements AfterViewInit {
     this.dnd.start(node, e);
   }
 
+  send(): void {
+    this.appService.subject$.next();
+  }
+
+  addAngularComponent(): void {
+    Graph.registerAngularContent('demo-component', { injector: this.injector, content: NodeComponent });
+    this.graph.addNode({
+      x: 40,
+      y: 40,
+      width: 160,
+      height: 30,
+      shape: 'angular-shape',
+      componentName: 'demo-component'
+    });
+  }
+
+  addAngularTemplate(): void {
+    Graph.registerAngularContent('demo-template', { injector: this.injector, content: this.demoTpl });
+    this.graph.addNode({
+      x: 240,
+      y: 40,
+      width: 160,
+      height: 30,
+      shape: 'angular-shape',
+      componentName: 'demo-template'
+    });
+  }
+
+  addAngularWithCallback(): void {
+    Graph.registerAngularContent('demo-template-callback', (_node) => {
+      return { injector: this.injector, content: this.demoTpl };
+    });
+    this.graph.addNode({
+      x: 440,
+      y: 40,
+      width: 160,
+      height: 30,
+      shape: 'angular-shape',
+      componentName: 'demo-template-callback'
+    });
+  }
+
   private initGraph(): void {
     const graphConfig = {
       ...this.graphBasicConfig,
@@ -504,6 +593,8 @@ export class AppComponent implements AfterViewInit {
     };
     this.graph = new Graph(graphConfig);
   }
+
+  constructor(private appService: AppService, private injector: Injector) {}
 
   // 必须是在这个钩子中初始化
   ngAfterViewInit(): void {

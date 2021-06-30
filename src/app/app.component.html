@@ -18,6 +18,7 @@
         <button (click)="addNode1()">添加节点(构造函数)</button>
         <button (click)="addNode2()">添加节点(graph自带)</button>
         <button (click)="addNode3()">添加节点(HTML)</button>
+        <button (click)="removeNode()">hover删除节点</button>
       </td>
     </tr>
     <tr>
@@ -41,7 +42,19 @@
         <button *ngIf="!dndFinishWithJudge" (click)="initDndWithJudge()">初始化拖拽</button>
       </td>
     </tr>
+    <tr>
+      <td>将Angular组件作为节点</td>
+      <td>
+        <button (click)="addAngularComponent()">Add angular component</button>
+        <button (click)="addAngularTemplate()">Add angular template</button>
+        <button (click)="addAngularWithCallback()">使用回调函数</button>
+      </td>
+    </tr>
   </table>
 </section>
 
 <div id="container" #container></div>
+
+<ng-template #demoTpl>
+  <div>Angular Template</div>
+</ng-template>
