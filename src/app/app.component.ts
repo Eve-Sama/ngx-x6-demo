@@ -4,7 +4,9 @@ import { HTML } from '@antv/x6/lib/shape/standard';
 import { Heros, HeroType } from './app.config';
 import { AppService } from './app.service';
 import { NodeComponent } from './node-component/node.component';
-import './x6-angular-shape/index';
+// import './x6-angular-shape/index';
+import '@antv/x6-angular-shape'
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
