@@ -1,27 +1,9 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { Subject } from 'rxjs';
-import { AppService } from '../app.service';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-node',
-  templateUrl: './node.component.html',
-  styleUrls: ['./node.component.scss']
+  template: `<div>{{ title }}</div>`
 })
-export class NodeComponent implements OnInit, OnDestroy {
-  private unsubscribe$ = new Subject<void>();
-
+export class NodeComponent {
   @Input() title: string;
-  
-  constructor(private appService: AppService) {}
-
-  ngOnInit(): void {
-    this.appService.subject$.subscribe(()=>{
-      console.log(1);
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
-  }
 }
