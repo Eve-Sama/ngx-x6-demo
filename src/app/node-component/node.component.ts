@@ -1,5 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { pipe, Subject } from 'rxjs';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Subject } from 'rxjs';
 import { AppService } from '../app.service';
 
 @Component({
@@ -10,6 +10,8 @@ import { AppService } from '../app.service';
 export class NodeComponent implements OnInit, OnDestroy {
   private unsubscribe$ = new Subject<void>();
 
+  @Input() title: string;
+  
   constructor(private appService: AppService) {}
 
   ngOnInit(): void {

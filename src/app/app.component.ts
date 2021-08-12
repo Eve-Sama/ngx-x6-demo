@@ -4,8 +4,8 @@ import { HTML } from '@antv/x6/lib/shape/standard';
 import { Heros, HeroType } from './app.config';
 import { AppService } from './app.service';
 import { NodeComponent } from './node-component/node.component';
-// import './x6-angular-shape/index';
-import '@antv/x6-angular-shape'
+import './x6-angular-shape/index';
+// import '@antv/x6-angular-shape'
 
 @Component({
   selector: 'app-root',
@@ -16,7 +16,9 @@ export class AppComponent implements AfterViewInit {
   Heros = Heros;
 
   @ViewChild('container') container: ElementRef;
-  @ViewChild('demoTpl', { static: true }) demoTpl: TemplateRef<{}>;
+  @ViewChild('demoTpl') demoTpl: TemplateRef<{}>;
+  @ViewChild('dataTpl') dataTpl: TemplateRef<{}>;
+
   graph: Graph;
   dnd: Addon.Dnd;
   dndFinishWithJudge: boolean;
@@ -553,6 +555,11 @@ export class AppComponent implements AfterViewInit {
   addAngularComponent(): void {
     Graph.registerAngularContent('demo-component', { injector: this.injector, content: NodeComponent });
     this.graph.addNode({
+      data: {
+        ngArguments: {
+          title: 'Angular Component'
+        }
+      },
       x: 40,
       y: 40,
       width: 160,
@@ -565,6 +572,11 @@ export class AppComponent implements AfterViewInit {
   addAngularTemplate(): void {
     Graph.registerAngularContent('demo-template', { injector: this.injector, content: this.demoTpl });
     this.graph.addNode({
+      data: {
+        ngArguments: {
+          title: 'Angular Template'
+        }
+      },
       x: 240,
       y: 40,
       width: 160,
@@ -575,10 +587,15 @@ export class AppComponent implements AfterViewInit {
   }
 
   addAngularWithCallback(): void {
-    Graph.registerAngularContent('demo-template-callback', (_node) => {
+    Graph.registerAngularContent('demo-template-callback', _node => {
       return { injector: this.injector, content: this.demoTpl };
     });
     this.graph.addNode({
+      data: {
+        ngArguments: {
+          title: 'Angular Callback'
+        }
+      },
       x: 440,
       y: 40,
       width: 160,

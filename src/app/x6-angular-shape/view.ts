@@ -29,12 +29,19 @@ export class AngularShapeView extends NodeView<AngularShape> {
       const viewContainerRef = injector.get(ViewContainerRef);
       const componentFactoryResolver = injector.get(ComponentFactoryResolver);
       const domOutlet = new DomPortalOutlet(root, componentFactoryResolver, applicationRef, injector);
+      const ngArguments = node.data?.ngArguments as { [key: string]: any } || {};
       if (content instanceof TemplateRef) {
-        const portal = new TemplatePortal(content, viewContainerRef);
+        const portal = new TemplatePortal(content, viewContainerRef, { ngArguments });
         domOutlet.attachTemplatePortal(portal);
       } else {
-        const portal = new ComponentPortal(content as any, viewContainerRef);
-        domOutlet.attachComponentPortal(portal);
+        const portal = new ComponentPortal(content, viewContainerRef);
+        const componentRef = domOutlet.attachComponentPortal(portal);
+        for (const key in ngArguments) {
+          if (Object.prototype.hasOwnProperty.call(ngArguments, key)) {
+            componentRef.instance[key] = ngArguments[key];
+          }
+        }
+        componentRef.changeDetectorRef.detectChanges();
       }
     }
   }
