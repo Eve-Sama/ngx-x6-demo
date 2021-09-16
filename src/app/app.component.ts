@@ -605,12 +605,147 @@ export class AppComponent implements AfterViewInit {
     });
   }
 
+  showBug(): void {
+    this.graph.clearCells();
+    // 定义好入口和出口样式
+    const groups = {
+      in: {
+        position: 'left',
+        attrs: {
+          circle: {
+            r: 5,
+            magnet: true,
+            stroke: '#CCD4E0',
+            strokeWidth: 1,
+            fill: '#fff'
+          }
+        }
+      },
+      out: {
+        position: 'right',
+        attrs: {
+          circle: {
+            r: 5,
+            magnet: true, // 是否允许吸附
+            stroke: '#CCD4E0',
+            strokeWidth: 1,
+            fill: '#fff'
+          }
+        }
+      }
+    };
+    const data1 = {
+      shape: 'html', // 必须指定为html
+      x: 100,
+      y: 250,
+      size: { width: 145, height: 48 },
+      html: {
+        // 节点内容, 使用HTML进行渲染
+        render(node: Cell): HTMLDivElement {
+          const wrap = document.createElement('div');
+          wrap.className = 'dataset-node-container normal';
+          wrap.innerHTML = `
+            <span class="node-name">连接节点</span>
+          `;
+          wrap.title = '连接节点';
+          return wrap;
+        },
+        // 控制节点重新渲染
+        shouldComponentUpdate(node: Cell): boolean {
+          return node.hasChanged('data');
+        }
+      },
+      ports: {
+        groups,
+        items: [{ group: 'out' }]
+      }
+    };
+    const data2 = {
+      shape: 'html', // 必须指定为html
+      x: 300,
+      y: 250,
+      size: { width: 145, height: 48 },
+      html: {
+        // 节点内容, 使用HTML进行渲染
+        render(node: Cell): HTMLDivElement {
+          const wrap = document.createElement('div');
+          wrap.className = 'dataset-node-container normal';
+          wrap.innerHTML = `
+            <span class="node-name">输出</span>
+          `;
+          wrap.title = '输出';
+          return wrap;
+        },
+        // 控制节点重新渲染
+        shouldComponentUpdate(node: Cell): boolean {
+          return node.hasChanged('data');
+        }
+      },
+      ports: {
+        groups,
+        items: [{ group: 'in' }]
+      }
+    };
+    const cell1 = this.graph.createNode(data1);
+    const cell2 = this.graph.createNode(data2);
+    this.graph.addCell(cell1);
+    this.graph.addCell(cell2);
+    const data = this.graph.toJSON();
+    const node1Data = data.cells[0];
+    const node2Data = data.cells[1];
+    const edgeData = {
+      source: { cell: node1Data.id, port: node1Data.ports.items[0].id },
+      target: { cell: node2Data.id, port: node2Data.ports.items[0].id }
+    };
+    const edge = new Shape.Edge(edgeData);
+    this.graph.addCell(edge);
+    console.log(this.graph.toJSON(), `this.graph.toJSON()`);
+  }
+  
   private initGraph(): void {
     const graphConfig = {
       ...this.graphBasicConfig,
       container: this.container.nativeElement
     };
     this.graph = new Graph(graphConfig);
+
+    this.graph.on('node:mouseenter', (args: { node: HTML }) => {
+      args.node.addTools({
+        name: 'button-remove', // x6 自带的tool类型
+        // 覆盖删除按钮自带的配置
+        args: {
+          markup: [
+            {
+              tagName: 'circle',
+              selector: 'button',
+              attrs: {
+                r: 8,
+                fill: '#ACB3BD',
+                cursor: 'pointer'
+              }
+            },
+            {
+              tagName: 'path',
+              selector: 'icon',
+              attrs: {
+                d: 'M -3 -3 3 3 M -3 3 3 -3',
+                fill: '#fff',
+                'stroke-width': 2,
+                'pointer-events': 'none'
+              }
+            }
+          ],
+          x: '100%',
+          onClick({ view, btn }: unknown): void {
+            btn.parent.remove();
+            view.cell.remove({ ui: true, toolId: btn.cid });
+          }
+        }
+      });
+    });
+    this.graph.on('node:mouseleave', (args: { node: HTML }) => {
+      args.node.removeTools();
+    });
   }
 
   constructor(private appService: AppService, private injector: Injector) {}
