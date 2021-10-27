@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, Injector, TemplateRef, ViewChild } from '@angular/core';
 import { Graph, Shape, Cell, Addon } from '@antv/x6';
 import { HTML } from '@antv/x6/lib/shape/standard';
+import { Subject } from 'rxjs';
 import { Heros, HeroType } from './app.config';
 import { AppService } from './app.service';
 import { NodeComponent } from './node-component/node.component';
@@ -552,12 +553,13 @@ export class AppComponent implements AfterViewInit {
     this.appService.subject$.next();
   }
 
+  
   addAngularComponent(): void {
     Graph.registerAngularContent('demo-component', { injector: this.injector, content: NodeComponent });
-    this.graph.addNode({
+    const node = this.graph.addNode({
       data: {
         ngArguments: {
-          title: 'Angular Component'
+          title: 'Angular Component',
         }
       },
       x: 40,
@@ -567,6 +569,15 @@ export class AppComponent implements AfterViewInit {
       shape: 'angular-shape',
       componentName: 'demo-component'
     });
+
+    // 使用setData更新Angular Component中的属性
+    setTimeout(() => {
+      node.setData({
+        ngArguments: {
+          title: 'Update Component'
+        }
+      });
+    }, 1000);
   }
 
   addAngularTemplate(): void {
@@ -605,6 +616,7 @@ export class AppComponent implements AfterViewInit {
     });
   }
 
+  // 不用care这个函数, 这是演示一个bug用的
   showBug(): void {
     this.graph.clearCells();
     // 定义好入口和出口样式
@@ -701,7 +713,7 @@ export class AppComponent implements AfterViewInit {
     this.graph.addCell(edge);
     console.log(this.graph.toJSON(), `this.graph.toJSON()`);
   }
-  
+
   private initGraph(): void {
     const graphConfig = {
       ...this.graphBasicConfig,
