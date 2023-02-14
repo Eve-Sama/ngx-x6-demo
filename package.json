@@ -11,15 +11,15 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "~12.0.3",
-    "@angular/cdk": "^12.0.5",
-    "@angular/common": "~12.0.3",
-    "@angular/compiler": "~12.0.3",
-    "@angular/core": "~12.0.3",
-    "@angular/forms": "~12.0.3",
-    "@angular/platform-browser": "~12.0.3",
-    "@angular/platform-browser-dynamic": "~12.0.3",
-    "@angular/router": "~12.0.3",
+    "@angular/animations": "~14.2.12",
+    "@angular/cdk": "^13.3.9",
+    "@angular/common": "~14.2.12",
+    "@angular/compiler": "~14.2.12",
+    "@angular/core": "~14.2.12",
+    "@angular/forms": "~14.2.12",
+    "@angular/platform-browser": "~14.2.12",
+    "@angular/platform-browser-dynamic": "~14.2.12",
+    "@angular/router": "~14.2.12",
     "@antv/x6": "^1.24.5",
     "@antv/x6-angular-shape": "^1.0.0",
     "rxjs": "~6.6.0",
@@ -29,7 +29,7 @@
   "devDependencies": {
     "@angular-devkit/build-angular": "~12.0.3",
     "@angular/cli": "~12.0.3",
-    "@angular/compiler-cli": "~12.0.3",
+    "@angular/compiler-cli": "~14.2.12",
     "@types/jasmine": "~3.6.0",
     "@types/jquery": "^3.5.5",
     "@types/jquery-mousewheel": "^3.1.8",
@@ -43,6 +43,6 @@
     "karma-coverage": "~2.0.3",
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "^1.5.0",
-    "typescript": "~4.2.3"
+    "typescript": "~4.8.4"
   }
 }
