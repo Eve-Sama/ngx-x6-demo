@@ -1,7 +1,7 @@
-import { ApplicationRef, ComponentFactoryResolver, TemplateRef, ViewContainerRef } from '@angular/core';
+import { ComponentRef, EmbeddedViewRef, TemplateRef, ViewContainerRef } from '@angular/core';
 import { NodeView, Scheduler } from '@antv/x6';
 import { AngularShape } from './node';
-import { ComponentPortal, DomPortalOutlet, TemplatePortal } from '@angular/cdk/portal';
+import { Content } from './registry';
 
 export class AngularShapeView extends NodeView<AngularShape> {
   protected init() {
@@ -19,32 +19,44 @@ export class AngularShapeView extends NodeView<AngularShape> {
     });
   }
 
+  private getNgArguments(): Record<string, any> {
+    const input = (this.cell.data?.ngArguments as Record<string, any>) || {};
+    return input;
+  }
+
+  /** 当执行 node.setData() 时需要对实例设置新的输入值 */
+  private setInstanceInput(content: Content, ref: EmbeddedViewRef<any> | ComponentRef<any>): void {
+    const ngArguments = this.getNgArguments();
+    if (content instanceof TemplateRef) {
+      const embeddedViewRef = ref as EmbeddedViewRef<any>;
+      embeddedViewRef.context = { ngArguments };
+    } else {
+      const componentRef = ref as ComponentRef<any>;
+      Object.keys(ngArguments).forEach(v => componentRef.setInput(v, ngArguments[v]));
+      componentRef.changeDetectorRef.detectChanges();
+    }
+  }
+
   protected renderAngularContent() {
     this.unmountAngularContent();
-    const root = this.getContentContainer();
-    if (root) {
+    const container = this.getContentContainer();
+    if (container) {
       const node = this.cell;
       const { injector, content } = this.graph.hook.getAngularContent(node);
-      const applicationRef = injector.get(ApplicationRef);
       const viewContainerRef = injector.get(ViewContainerRef);
-      const componentFactoryResolver = injector.get(ComponentFactoryResolver);
-      const domOutlet = new DomPortalOutlet(root, componentFactoryResolver, applicationRef, injector);
       if (content instanceof TemplateRef) {
-        const ngArguments = (node.data?.ngArguments as { [key: string]: any }) || {};
-        const portal = new TemplatePortal(content, viewContainerRef, { ngArguments });
-        domOutlet.attachTemplatePortal(portal);
+        const ngArguments = this.getNgArguments();
+        const embeddedViewRef = viewContainerRef.createEmbeddedView(content, { ngArguments });
+        embeddedViewRef.rootNodes.forEach(node => container.appendChild(node));
+        embeddedViewRef.detectChanges();
+        node.on('change:data', () => this.setInstanceInput(content, embeddedViewRef));
       } else {
-        const portal = new ComponentPortal(content, viewContainerRef);
-        const componentRef = domOutlet.attachComponentPortal(portal);
-        // 将用户传入的ngArguments依次赋值到component的属性当中
-        const renderComponentInstance = () => {
-          const ngArguments = (node.data?.ngArguments as { [key: string]: any }) || {};
-          Object.keys(ngArguments).forEach(v => (componentRef.instance[v] = ngArguments[v]));
-          componentRef.changeDetectorRef.detectChanges();
-        };
-        renderComponentInstance();
-        // 监听用户调用setData方法
-        node.on('change:data', () => renderComponentInstance());
+        const componentRef = viewContainerRef.createComponent(content);
+        const insertNode = (componentRef.hostView as EmbeddedViewRef<any>).rootNodes[0] as HTMLElement;
+        container.appendChild(insertNode);
+        this.setInstanceInput(content, componentRef);
+        node.on('change:data', () => this.setInstanceInput(content, componentRef));
+        node.on('removed', () => componentRef.destroy());
       }
     }
   }
